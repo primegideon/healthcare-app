@@ -1,0 +1,41 @@
+[
+  {
+    "patientId": "PT-1001",
+    "firstName": "Kwame",
+    "lastName": "Mensah",
+    "dateOfBirth": "1985-03-14",
+    "bloodType": "O+",
+    "primaryDiagnosis": "Malaria",
+    "attendingPhysician": "Dr. Ama Boateng",
+    "ward": "General",
+    "admissionDate": "2026-09-20",
+    "status": "Admitted",
+    "weightKg": 72.5
+  },
+  {
+    "patientId": "PT-1002",
+    "firstName": "Abena",
+    "lastName": "Owusu",
+    "dateOfBirth": "1992-11-02",
+    "bloodType": "A+",
+    "primaryDiagnosis": "Pre-eclampsia monitoring",
+    "attendingPhysician": "Dr. Kofi Asante",
+    "ward": "Maternity",
+    "admissionDate": "2026-09-22",
+    "status": "Admitted",
+    "weightKg": 68.0
+  },
+  {
+    "patientId": "PT-1003",
+    "firstName": "Yaw",
+    "lastName": "Darko",
+    "dateOfBirth": "2016-06-30",
+    "bloodType": "B-",
+    "primaryDiagnosis": "Asthma follow-up",
+    "attendingPhysician": "Dr. Efua Mensah",
+    "ward": "Paediatrics",
+    "admissionDate": "2026-09-18",
+    "status": "Outpatient",
+    "weightKg": 24.3
+  }
+]

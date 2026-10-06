@@ -1,0 +1,6 @@
+{
+  "pathParameters": {
+    "patientId": "PT-1001"
+  },
+  "body": "{\"status\": \"Discharged\", \"ward\": \"General\"}"
+}

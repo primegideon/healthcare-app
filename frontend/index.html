@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Riverside General · Patient Records</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="app-header">
+    <div class="wrap">
+      <p class="org">Riverside General Hospital</p>
+      <h1>Patient records</h1>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div id="messages" aria-live="polite"></div>
+
+    <!-- FIND A RECORD (GET) -->
+    <section class="panel">
+      <h2>Find a patient</h2>
+      <form id="searchForm" class="search-row">
+        <label for="searchId" class="sr-only">Patient ID</label>
+        <input type="text" id="searchId" placeholder="Patient ID, e.g. PT-1001" required>
+        <button type="submit">Find patient</button>
+      </form>
+    </section>
+
+    <!-- RECORD DETAILS, EDIT (PUT) AND DELETE (DELETE) -->
+    <section class="panel" id="detailsPanel" hidden>
+      <div class="panel-head">
+        <h2 id="detailsTitle">Patient details</h2>
+        <div class="actions">
+          <button type="button" id="editButton" class="secondary">Edit</button>
+          <button type="button" id="deleteButton" class="danger">Delete</button>
+        </div>
+      </div>
+      <dl id="details" class="details"></dl>
+
+      <form id="editForm" hidden>
+        <div class="grid">
+        <div class="field">
+          <label for="edit-firstName">First name</label>
+          <input type="text" id="edit-firstName" required placeholder="Kwame">
+        </div>
+        <div class="field">
+          <label for="edit-lastName">Last name</label>
+          <input type="text" id="edit-lastName" required placeholder="Mensah">
+        </div>
+        <div class="field">
+          <label for="edit-dateOfBirth">Date of birth</label>
+          <input type="date" id="edit-dateOfBirth" required>
+        </div>
+        <div class="field">
+          <label for="edit-bloodType">Blood type</label>
+          <select id="edit-bloodType" required>
+            <option value="">Choose…</option>
+            <option value="A+">A+</option>
+            <option value="A-">A-</option>
+            <option value="B+">B+</option>
+            <option value="B-">B-</option>
+            <option value="AB+">AB+</option>
+            <option value="AB-">AB-</option>
+            <option value="O+">O+</option>
+            <option value="O-">O-</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="edit-primaryDiagnosis">Primary diagnosis</label>
+          <input type="text" id="edit-primaryDiagnosis" required placeholder="Malaria">
+        </div>
+        <div class="field">
+          <label for="edit-attendingPhysician">Attending physician</label>
+          <input type="text" id="edit-attendingPhysician" required placeholder="Dr. Ama Boateng">
+        </div>
+        <div class="field">
+          <label for="edit-ward">Ward</label>
+          <select id="edit-ward" required>
+            <option value="">Choose…</option>
+            <option value="General">General</option>
+            <option value="Maternity">Maternity</option>
+            <option value="Paediatrics">Paediatrics</option>
+            <option value="Surgical">Surgical</option>
+            <option value="ICU">ICU</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="edit-admissionDate">Admission date</label>
+          <input type="date" id="edit-admissionDate" required>
+        </div>
+        <div class="field">
+          <label for="edit-status">Status</label>
+          <select id="edit-status" required>
+            <option value="">Choose…</option>
+            <option value="Admitted">Admitted</option>
+            <option value="Outpatient">Outpatient</option>
+            <option value="Discharged">Discharged</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="edit-weightKg">Weight (kg)</label>
+          <input type="number" id="edit-weightKg" required placeholder="72.5" step="0.1" min="0" max="400">
+        </div>
+        </div>
+        <div class="actions">
+          <button type="submit">Save changes</button>
+          <button type="button" id="cancelEdit" class="secondary">Cancel</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- ADD A RECORD (POST) -->
+    <section class="panel">
+      <h2>Add a patient</h2>
+      <form id="createForm">
+        <div class="grid">
+        <div class="field">
+          <label for="new-patientId">Patient ID</label>
+          <input type="text" id="new-patientId" placeholder="PT-1001" required>
+          <small>PT- followed by 4 digits</small>
+        </div>
+        <div class="field">
+          <label for="new-firstName">First name</label>
+          <input type="text" id="new-firstName" required placeholder="Kwame">
+        </div>
+        <div class="field">
+          <label for="new-lastName">Last name</label>
+          <input type="text" id="new-lastName" required placeholder="Mensah">
+        </div>
+        <div class="field">
+          <label for="new-dateOfBirth">Date of birth</label>
+          <input type="date" id="new-dateOfBirth" required>
+        </div>
+        <div class="field">
+          <label for="new-bloodType">Blood type</label>
+          <select id="new-bloodType" required>
+            <option value="">Choose…</option>
+            <option value="A+">A+</option>
+            <option value="A-">A-</option>
+            <option value="B+">B+</option>
+            <option value="B-">B-</option>
+            <option value="AB+">AB+</option>
+            <option value="AB-">AB-</option>
+            <option value="O+">O+</option>
+            <option value="O-">O-</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="new-primaryDiagnosis">Primary diagnosis</label>
+          <input type="text" id="new-primaryDiagnosis" required placeholder="Malaria">
+        </div>
+        <div class="field">
+          <label for="new-attendingPhysician">Attending physician</label>
+          <input type="text" id="new-attendingPhysician" required placeholder="Dr. Ama Boateng">
+        </div>
+        <div class="field">
+          <label for="new-ward">Ward</label>
+          <select id="new-ward" required>
+            <option value="">Choose…</option>
+            <option value="General">General</option>
+            <option value="Maternity">Maternity</option>
+            <option value="Paediatrics">Paediatrics</option>
+            <option value="Surgical">Surgical</option>
+            <option value="ICU">ICU</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="new-admissionDate">Admission date</label>
+          <input type="date" id="new-admissionDate" required>
+        </div>
+        <div class="field">
+          <label for="new-status">Status</label>
+          <select id="new-status" required>
+            <option value="">Choose…</option>
+            <option value="Admitted">Admitted</option>
+            <option value="Outpatient">Outpatient</option>
+            <option value="Discharged">Discharged</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="new-weightKg">Weight (kg)</label>
+          <input type="number" id="new-weightKg" required placeholder="72.5" step="0.1" min="0" max="400">
+        </div>
+        </div>
+        <div class="actions">
+          <button type="submit">Add patient</button>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <footer class="wrap footer">Training project · fictional data only</footer>
+  <script src="app.js"></script>
+</body>
+</html>

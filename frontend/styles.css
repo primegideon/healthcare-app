@@ -1,0 +1,92 @@
+/* Riverside General · Patient Records — the only track-specific values are the three colours below. */
+:root {
+  --accent: #0B7A75;
+  --accent-dark: #075652;
+  --accent-soft: #E2F1F0;
+  --ink: #1B2430;
+  --muted: #5B6675;
+  --line: #D8DEE6;
+  --bg: #F4F6F9;
+  --danger: #B42318;
+  --ok: #067647;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: var(--ink);
+  background: var(--bg);
+  line-height: 1.5;
+}
+.wrap { max-width: 960px; margin: 0 auto; padding: 0 20px; }
+
+.app-header { background: var(--accent); color: #fff; padding: 28px 0 24px; margin-bottom: 28px; }
+.app-header h1 { margin: 0; font-size: 1.75rem; }
+.org { margin: 0 0 4px; opacity: 0.85; }
+
+.panel {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 24px;
+  margin-bottom: 20px;
+}
+.panel h2 { margin: 0 0 16px; font-size: 1.2rem; }
+.panel-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field small { color: var(--muted); }
+label { font-weight: 600; font-size: 0.9rem; }
+input, select {
+  font: inherit;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #fff;
+}
+input:focus, select:focus, button:focus-visible { outline: 3px solid var(--accent-soft); border-color: var(--accent); }
+
+.search-row { display: flex; gap: 10px; }
+.search-row input { flex: 1; }
+
+.actions { display: flex; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
+.panel-head .actions { margin-top: 0; }
+button {
+  font: inherit;
+  font-weight: 600;
+  padding: 10px 18px;
+  border-radius: 6px;
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+}
+button:hover { background: var(--accent-dark); }
+button.secondary { background: #fff; color: var(--accent); }
+button.secondary:hover { background: var(--accent-soft); }
+button.danger { background: #fff; color: var(--danger); border-color: var(--danger); }
+button.danger:hover { background: #FEF3F2; }
+button:disabled { opacity: 0.6; cursor: wait; }
+
+.details { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px 24px; margin: 18px 0 0; }
+.details dt { color: var(--muted); font-size: 0.85rem; }
+.details dd { margin: 2px 0 0; font-weight: 600; }
+
+.message {
+  padding: 12px 16px;
+  border-radius: 6px;
+  margin-bottom: 14px;
+  border-left: 4px solid;
+  background: #fff;
+}
+.message.success { border-color: var(--ok); }
+.message.error { border-color: var(--danger); }
+
+.footer { color: var(--muted); font-size: 0.85rem; padding-bottom: 32px; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+
+@media (max-width: 560px) {
+  .search-row { flex-direction: column; }
+}
