@@ -147,6 +147,59 @@ document.getElementById("searchForm").addEventListener("submit", (event) => {
     document.getElementById("detailsPanel").hidden = true;
     const record = await callApi("GET", endpoint(id));
     showRecord(record);
+    
+    // Reset appointment form toggle state
+    document.getElementById("bookAppointmentForm").style.display = "none";
+    document.getElementById("showBookApptBtn").style.display = "inline-block";
+    
+    const apptsList = document.getElementById("appointmentsList");
+    apptsList.innerHTML = "<li>Loading appointments...</li>";
+    try {
+      const appointments = await callApi("GET", `${endpoint(id)}/appointments`);
+      if (appointments.length === 0) {
+        apptsList.innerHTML = "<li style='color: var(--muted);'>No appointments scheduled.</li>";
+      } else {
+        apptsList.innerHTML = "";
+        for (const apt of appointments) {
+          const li = document.createElement("li");
+          li.style.marginBottom = "8px";
+          li.style.padding = "10px";
+          li.style.background = "var(--bg)";
+          li.style.borderRadius = "6px";
+          li.style.display = "flex";
+          li.style.justifyContent = "space-between";
+          li.style.alignItems = "center";
+          
+          const textDiv = document.createElement("div");
+          textDiv.innerHTML = `<strong>${apt.appointmentDate}</strong> <br/> ${apt.reason || "General appointment"}`;
+          
+          const delBtn = document.createElement("button");
+          delBtn.textContent = "Cancel";
+          delBtn.className = "danger";
+          delBtn.style.padding = "6px 12px";
+          delBtn.style.fontSize = "0.85rem";
+          
+          delBtn.addEventListener("click", async () => {
+              if (!confirm(`Cancel appointment on ${apt.appointmentDate}?`)) return;
+              withBusy(delBtn, async () => {
+                  await callApi("DELETE", `${endpoint(id)}/appointments/${encodeURIComponent(apt.appointmentDate)}`);
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                  showMessage(`Appointment on ${apt.appointmentDate} canceled.`);
+                  li.remove();
+                  if (apptsList.children.length === 0) {
+                     apptsList.innerHTML = "<li style='color: var(--muted);'>No appointments scheduled.</li>";
+                  }
+              });
+          });
+          
+          li.appendChild(textDiv);
+          li.appendChild(delBtn);
+          apptsList.appendChild(li);
+        }
+      }
+    } catch (err) {
+      apptsList.innerHTML = "<li style='color: var(--danger);'>Could not load appointments.</li>";
+    }
   });
 });
 
@@ -185,6 +238,115 @@ document.getElementById("deleteButton").addEventListener("click", (event) => {
     document.getElementById("detailsPanel").hidden = true;
     currentRecord = null;
     showMessage(`${ENTITY} ${id} deleted.`);
+  });
+});
+
+// =====================================================================
+// BOOK APPOINTMENT (POST /patients/{id}/appointments)
+// =====================================================================
+document.getElementById("showBookApptBtn").addEventListener("click", () => {
+  document.getElementById("bookAppointmentForm").style.display = "flex";
+  document.getElementById("showBookApptBtn").style.display = "none";
+});
+
+document.getElementById("bookAppointmentForm").addEventListener("submit", (event) => {
+  event.preventDefault();
+  const form = event.target;
+  withBusy(event.submitter, async () => {
+    const id = currentRecord[KEY_FIELD];
+    const date = document.getElementById("new-appt-date").value;
+    const reason = document.getElementById("new-appt-reason").value.trim();
+    
+    await callApi("POST", `${endpoint(id)}/appointments`, { appointmentDate: date, reason: reason });
+    
+    // Scroll to the top so the user can actually see the green success message!
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    showMessage(`Appointment booked for ${date}.`);
+    form.reset();
+    
+    // Hide form and show button again
+    document.getElementById("bookAppointmentForm").style.display = "none";
+    document.getElementById("showBookApptBtn").style.display = "inline-block";
+    
+    // Smoothly refresh just the appointments list without reloading the whole patient panel
+    const apptsList = document.getElementById("appointmentsList");
+    apptsList.innerHTML = "<li>Loading new appointment...</li>";
+    try {
+      const appointments = await callApi("GET", `${endpoint(id)}/appointments`);
+      apptsList.innerHTML = "";
+      for (const apt of appointments) {
+        const li = document.createElement("li");
+        li.style.marginBottom = "8px";
+        li.style.padding = "10px";
+        li.style.background = "var(--bg)";
+        li.style.borderRadius = "6px";
+        li.style.display = "flex";
+        li.style.justifyContent = "space-between";
+        li.style.alignItems = "center";
+        
+        const textDiv = document.createElement("div");
+        textDiv.innerHTML = `<strong>${apt.appointmentDate}</strong> <br/> ${apt.reason || "General appointment"}`;
+        
+        const delBtn = document.createElement("button");
+        delBtn.textContent = "Cancel";
+        delBtn.className = "danger";
+        delBtn.style.padding = "6px 12px";
+        delBtn.style.fontSize = "0.85rem";
+        
+        delBtn.addEventListener("click", async () => {
+            if (!confirm(`Cancel appointment on ${apt.appointmentDate}?`)) return;
+            withBusy(delBtn, async () => {
+                await callApi("DELETE", `${endpoint(id)}/appointments/${encodeURIComponent(apt.appointmentDate)}`);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                showMessage(`Appointment on ${apt.appointmentDate} canceled.`);
+                li.remove();
+                if (apptsList.children.length === 0) {
+                   apptsList.innerHTML = "<li style='color: var(--muted);'>No appointments scheduled.</li>";
+                }
+            });
+        });
+        
+        li.appendChild(textDiv);
+        li.appendChild(delBtn);
+        apptsList.appendChild(li);
+      }
+    } catch (err) {
+      apptsList.innerHTML = "<li style='color: var(--danger);'>Could not load appointments.</li>";
+    }
+  });
+});
+
+// =====================================================================
+// WARD DASHBOARD (GET /wards/{ward}/patients)
+// =====================================================================
+document.getElementById("wardForm").addEventListener("submit", (event) => {
+  event.preventDefault();
+  withBusy(event.submitter, async () => {
+    const ward = document.getElementById("searchWard").value;
+    const url = `${API_BASE_URL}/wards/${encodeURIComponent(ward)}/patients`;
+    
+    document.getElementById("wardResults").innerHTML = "<p>Loading patients...</p>";
+    
+    try {
+      const patients = await callApi("GET", url);
+      const resultsDiv = document.getElementById("wardResults");
+      
+      if (patients.length === 0) {
+        resultsDiv.innerHTML = `<p style='color: var(--muted);'>No patients currently in ${ward}.</p>`;
+      } else {
+        let html = `<ul style='list-style-type: none; padding: 0;'>`;
+        for (const p of patients) {
+          html += `<li style='padding: 12px; border-bottom: 1px solid var(--line); margin-bottom: 8px; background: var(--bg); border-radius: 6px;'>
+                     <strong>${p.patientId}</strong>: ${p.firstName} ${p.lastName} <br/>
+                     <small style='color: var(--muted);'>Status: ${p.status} | Diagnosis: ${p.primaryDiagnosis}</small>
+                   </li>`;
+        }
+        html += `</ul>`;
+        resultsDiv.innerHTML = html;
+      }
+    } catch (err) {
+      document.getElementById("wardResults").innerHTML = `<p style='color: var(--danger);'>Error: ${err.message}</p>`;
+    }
   });
 });
 

@@ -27,6 +27,24 @@
       </form>
     </section>
 
+    <!-- WARD DASHBOARD (GET /wards/{ward}/patients) -->
+    <section class="panel">
+      <h2>Ward dashboard</h2>
+      <form id="wardForm" class="search-row">
+        <label for="searchWard" class="sr-only">Select Ward</label>
+        <select id="searchWard" required>
+          <option value="">Choose a ward…</option>
+          <option value="General">General</option>
+          <option value="Maternity">Maternity</option>
+          <option value="Paediatrics">Paediatrics</option>
+          <option value="Surgical">Surgical</option>
+          <option value="ICU">ICU</option>
+        </select>
+        <button type="submit">View patients</button>
+      </form>
+      <div id="wardResults" style="margin-top: 16px;"></div>
+    </section>
+
     <!-- RECORD DETAILS, EDIT (PUT) AND DELETE (DELETE) -->
     <section class="panel" id="detailsPanel" hidden>
       <div class="panel-head">
@@ -108,6 +126,23 @@
           <button type="button" id="cancelEdit" class="secondary">Cancel</button>
         </div>
       </form>
+
+      <div id="appointmentsSection" style="margin-top: 24px; border-top: 1px solid var(--line); padding-top: 16px;">
+        <h3>Appointments</h3>
+        <ul id="appointmentsList" style="list-style-type: none; padding-left: 0;"></ul>
+        <button type="button" id="showBookApptBtn" class="secondary" style="margin-top: 8px;">+ Book Appointment</button>
+        <form id="bookAppointmentForm" style="margin-top: 16px; display: none; gap: 8px; flex-wrap: wrap; align-items: flex-end;">
+          <div class="field" style="flex: 1; min-width: 150px;">
+            <label for="new-appt-date">Date</label>
+            <input type="date" id="new-appt-date" required>
+          </div>
+          <div class="field" style="flex: 2; min-width: 200px;">
+            <label for="new-appt-reason">Reason</label>
+            <input type="text" id="new-appt-reason" placeholder="e.g. Follow-up" required>
+          </div>
+          <button type="submit" style="margin-bottom: 2px;">Book</button>
+        </form>
+      </div>
     </section>
 
     <!-- ADD A RECORD (POST) -->

@@ -1,0 +1,5 @@
+{
+  "pathParameters": {
+    "patientId": "PT-1001"
+  }
+}

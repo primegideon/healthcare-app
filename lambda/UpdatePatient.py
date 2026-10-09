@@ -77,6 +77,17 @@ def lambda_handler(event, context):
         values[f":v{i}"] = value
         parts.append(f"#f{i} = :v{i}")
 
+    # Determine if an ICU alert should be triggered.
+    # Alert only if the ward is being explicitly changed to ICU.
+    is_moving_to_icu = False
+    if updates.get("ward") == "ICU":
+        try:
+            current_item = table.get_item(Key={KEY_NAME: record_id}).get("Item", {})
+            if current_item.get("ward") != "ICU":
+                is_moving_to_icu = True
+        except ClientError:
+            pass 
+
     try:
         result = table.update_item(
             Key={KEY_NAME: record_id},
@@ -91,5 +102,19 @@ def lambda_handler(event, context):
             return respond(404, {"error": f"No {ENTITY.lower()} found with ID {record_id}."})
         print(f"Update failed for {record_id}: {err}")
         return respond(500, {"error": "Could not update the record. Check CloudWatch Logs."})
+
+    # Publish alert if the patient was moved to the ICU.
+    if is_moving_to_icu:
+        try:
+            sns = boto3.client("sns")
+            account_id = context.invoked_function_arn.split(":")[4]
+            region = os.environ.get("AWS_REGION", "us-east-1")
+            topic_arn = f"arn:aws:sns:{region}:{account_id}:ICU-Alerts"
+            
+            message = f"URGENT: Patient {record_id} has been moved to the ICU."
+            sns.publish(TopicArn=topic_arn, Message=message, Subject="ICU Alert")
+            print(f"ICU alert sent for {record_id}")
+        except Exception as e:
+            print(f"Failed to send ICU alert: {e}")
 
     return respond(200, {"message": f"{ENTITY} {record_id} updated.", "record": result["Attributes"]})

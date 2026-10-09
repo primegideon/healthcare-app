@@ -1,0 +1,6 @@
+{
+  "pathParameters": {
+    "patientId": "PT-1001"
+  },
+  "body": "{\"appointmentDate\": \"2026-10-15\", \"reason\": \"Follow-up checkup\"}"
+}
