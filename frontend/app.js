@@ -36,6 +36,12 @@ function endpoint(id) {
 // so every caller can show it to the user.
 async function callApi(method, url, body) {
   const options = { method, headers: { "Content-Type": "application/json" } };
+  
+  // Attach Cognito Token if logged in
+  if (idToken) {
+    options.headers["Authorization"] = idToken;
+  }
+  
   if (body) options.body = JSON.stringify(body);
 
   let response;
@@ -356,3 +362,96 @@ document.getElementById("wardForm").addEventListener("submit", (event) => {
 if (API_BASE_URL.includes("YOUR-API-ID")) {
   showMessage("Set API_BASE_URL at the top of app.js to your API Gateway Invoke URL.", "error");
 }
+
+// =====================================================================
+// 9. COGNITO AUTHENTICATION
+// =====================================================================
+const COGNITO_DOMAIN = "https://us-east-1zwwgmz239.auth.us-east-1.amazoncognito.com";
+const CLIENT_ID = "34gi60mb92uausj83u89j7pqof";
+const REDIRECT_URI = "https://d1w9ujpst900kk.cloudfront.net";
+const LOGIN_URL = `${COGNITO_DOMAIN}/login?client_id=${CLIENT_ID}&response_type=code&scope=email+openid+phone&redirect_uri=${encodeURIComponent(REDIRECT_URI)}`;
+
+let idToken = localStorage.getItem("idToken");
+
+function isTokenExpired(token) {
+  if (!token) return true;
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return (Math.floor(Date.now() / 1000) >= payload.exp);
+  } catch (e) {
+    return true;
+  }
+}
+
+async function handleAuth() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const code = urlParams.get('code');
+  
+  if (code) {
+    // Exchange the authorization code for tokens
+    const tokenUrl = `${COGNITO_DOMAIN}/oauth2/token`;
+    const body = new URLSearchParams({
+      grant_type: 'authorization_code',
+      client_id: CLIENT_ID,
+      code: code,
+      redirect_uri: REDIRECT_URI
+    });
+    
+    try {
+      const response = await fetch(tokenUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: body
+      });
+      const data = await response.json();
+      if (data.id_token) {
+        idToken = data.id_token;
+        localStorage.setItem("idToken", idToken);
+        // Clean up the URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+    } catch (e) {
+      console.error("Error exchanging token", e);
+    }
+  }
+
+  // Check if token is valid or expired
+  if (idToken && isTokenExpired(idToken)) {
+    localStorage.removeItem("idToken");
+    idToken = null;
+  }
+  
+  const authContainer = document.getElementById("authContainer");
+  const mainApp = document.getElementById("mainApp");
+  const loggedOutContainer = document.getElementById("loggedOutContainer");
+  const mainHeader = document.getElementById("mainHeader");
+
+  const LOGOUT_URL = `${COGNITO_DOMAIN}/logout?client_id=${CLIENT_ID}&logout_uri=${encodeURIComponent(REDIRECT_URI)}`;
+
+  if (idToken) {
+    // Logged In State
+    if (authContainer) authContainer.innerHTML = `<button id="logoutBtn" class="secondary" style="margin:0;">Sign out</button>`;
+    if (mainApp) mainApp.style.display = "block";
+    if (mainHeader) mainHeader.style.display = "block";
+    if (loggedOutContainer) loggedOutContainer.style.display = "none";
+    
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+      localStorage.removeItem("idToken");
+      idToken = null;
+      window.location.replace(LOGOUT_URL);
+    });
+  } else {
+    // Logged Out State
+    if (mainApp) mainApp.style.display = "none";
+    if (mainHeader) mainHeader.style.display = "none";
+    if (loggedOutContainer) {
+      loggedOutContainer.style.display = "flex";
+      document.getElementById("splashLoginBtn").addEventListener("click", () => {
+        window.location.href = LOGIN_URL;
+      });
+    }
+  }
+}
+
+// Call on startup
+handleAuth();

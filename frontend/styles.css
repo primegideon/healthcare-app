@@ -19,7 +19,22 @@ body {
   background: var(--bg);
   line-height: 1.5;
 }
-.wrap { max-width: 960px; margin: 0 auto; padding: 0 20px; }
+.wrap { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+
+/* LAYOUT */
+.dashboard-top-row {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+@media (max-width: 800px) {
+  .dashboard-top-row {
+    flex-direction: column;
+  }
+  .dashboard-top-row .panel {
+    margin-bottom: 24px !important;
+  }
+}
 
 .app-header { background: var(--accent); color: #fff; padding: 28px 0 24px; margin-bottom: 28px; }
 .app-header h1 { margin: 0; font-size: 1.75rem; }
@@ -89,4 +104,63 @@ button:disabled { opacity: 0.6; cursor: wait; }
 
 @media (max-width: 560px) {
   .search-row { flex-direction: column; }
+}
+
+
+/* SPLASH SCREEN UI */
+.splash-screen {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f3f4f6 0%, #e2e8f0 50%, #dbeafe 100%);
+  padding: 20px;
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 1000;
+}
+.splash-card {
+  background: white;
+  padding: 40px 40px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  text-align: left;
+  max-width: 400px;
+  width: 100%;
+}
+.splash-icon {
+  margin-bottom: 24px;
+}
+.splash-icon svg {
+  width: 40px;
+  height: 40px;
+  fill: #0072c6;
+}
+.splash-card h2 {
+  color: #111;
+  margin-bottom: 8px;
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.splash-subtitle {
+  color: #555 !important;
+  font-weight: 400 !important;
+  font-size: 0.95rem !important;
+  margin-bottom: 36px !important;
+}
+.splash-btn {
+  background: #0072c6;
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 10px 16px;
+  border-radius: 4px;
+  width: 100%;
+  transition: background 0.2s;
+  border: none;
+  cursor: pointer;
+}
+.splash-btn:hover {
+  background: #005a9e;
 }
