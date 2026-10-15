@@ -34,7 +34,7 @@ flowchart TD
     L3 -.->|Critical ICU Event| SNS[Amazon SNS: ICU-Alerts Topic]
 ```
 
-![AWS Architecture Diagram](assets/AWS-Architcure.png)
+
 
 ### Architectural Components
 * **Edge & Delivery:** Amazon CloudFront providing TLS 1.3 encryption, DDoS mitigation, and global asset caching.
