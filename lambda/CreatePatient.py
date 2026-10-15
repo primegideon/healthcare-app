@@ -1,6 +1,5 @@
 """
 CreatePatient - adds a new patient record
-Track: Healthcare (Patient Records System)
 API route: POST /patients
 """
 import json
@@ -12,8 +11,7 @@ import boto3
 from botocore.exceptions import ClientError
 
 # ---------------------------------------------------------------------------
-# Track configuration: this block is the ONLY part that differs between the
-# Healthcare, Finance and HR versions of the project.
+# Entity Configuration & Validation Rules
 # ---------------------------------------------------------------------------
 TABLE_NAME = os.environ.get("TABLE_NAME", "PatientRecords")
 KEY_NAME = "patientId"
@@ -51,7 +49,7 @@ def now_iso():
 
 
 def lambda_handler(event, context):
-    # 1. Read the JSON body. parse_float=Decimal lets DynamoDB store decimals.
+    # 1. Ingest JSON payload with Decimal parsing for numeric precision in DynamoDB.
     try:
         record = json.loads(event.get("body") or "{}", parse_float=Decimal)
     except json.JSONDecodeError:
@@ -62,11 +60,11 @@ def lambda_handler(event, context):
     if missing:
         return respond(400, {"error": "Missing required fields: " + ", ".join(missing)})
 
-    # 3. Normalise the ID so "pt-1001" and "PT-1001" are the same record.
+    # 3. Normalize primary key identifier to uppercase.
     record[KEY_NAME] = str(record[KEY_NAME]).strip().upper()
     record["createdAt"] = now_iso()
 
-    # 4. Save it, but refuse to overwrite an existing record with the same ID.
+    # 4. Persist record enforcing condition expression to prevent overwriting existing keys.
     try:
         table.put_item(
             Item=record,
@@ -76,7 +74,7 @@ def lambda_handler(event, context):
     except ClientError as err:
         if err.response["Error"]["Code"] == "ConditionalCheckFailedException":
             return respond(409, {"error": f"{ENTITY} {record[KEY_NAME]} already exists."})
-        # Never print a whole patient record to CloudWatch Logs. Log only the patient ID and the error.
+        # Log error metadata without outputting Protected Health Information (PHI) to CloudWatch.
         print(f"Create failed for {record[KEY_NAME]}: {err}")
         return respond(500, {"error": "Could not save the record. Check CloudWatch Logs."})
 

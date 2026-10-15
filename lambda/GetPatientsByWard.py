@@ -1,6 +1,5 @@
 """
 GetPatientsByWard - Retrieves all patients currently in a specific ward
-Track: Healthcare (Patient Records System)
 API route: GET /wards/{ward}/patients
 """
 import json
@@ -37,8 +36,7 @@ def lambda_handler(event, context):
     print("Received event:", json.dumps(event))
     path_params = event.get("pathParameters") or {}
     
-    # Look for 'ward', but if they named the variable something else in API Gateway
-    # (like {wards} or {id}), just grab whatever path parameter is there.
+    # Extract ward parameter with fallback resolution for path parameter key variations
     ward = path_params.get("ward")
     if not ward and path_params:
         ward = list(path_params.values())[0]

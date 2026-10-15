@@ -41,7 +41,7 @@ def lambda_handler(event, context):
         return respond(400, {"error": f"The URL is missing the {KEY_NAME}."})
         
     try:
-        # Use query instead of get_item to get all matching rows!
+        # Query partition key to retrieve all scheduled records for patient
         result = table.query(
             KeyConditionExpression=Key(KEY_NAME).eq(record_id)
         )

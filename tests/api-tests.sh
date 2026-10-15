@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# Replace the URL below with your own Invoke URL from API Gateway (step 15).
+# Configure API Gateway Invoke URL for integration testing
 API="https://YOUR-API-ID.execute-api.us-east-1.amazonaws.com/prod"
 
-# 1. Create the three sample patients
+# 1. Seed sample patient records (POST /patients)
 curl -X POST "$API/patients" -H "Content-Type: application/json" \
   -d '{"patientId": "PT-1001", "firstName": "Kwame", "lastName": "Mensah", "dateOfBirth": "1985-03-14", "bloodType": "O+", "primaryDiagnosis": "Malaria", "attendingPhysician": "Dr. Ama Boateng", "ward": "General", "admissionDate": "2026-09-20", "status": "Admitted", "weightKg": 72.5}'
 curl -X POST "$API/patients" -H "Content-Type: application/json" \
@@ -10,21 +10,21 @@ curl -X POST "$API/patients" -H "Content-Type: application/json" \
 curl -X POST "$API/patients" -H "Content-Type: application/json" \
   -d '{"patientId": "PT-1003", "firstName": "Yaw", "lastName": "Darko", "dateOfBirth": "2016-06-30", "bloodType": "B-", "primaryDiagnosis": "Asthma follow-up", "attendingPhysician": "Dr. Efua Mensah", "ward": "Paediatrics", "admissionDate": "2026-09-18", "status": "Outpatient", "weightKg": 24.3}'
 
-# 2. Read one back (expect 200)
+# 2. Retrieve patient record by ID (GET /patients/{id} -> 200 OK)
 curl "$API/patients/PT-1001"
 
-# 3. Update it (expect 200 and an updatedAt timestamp)
+# 3. Update patient status & ward (PUT /patients/{id} -> 200 OK)
 curl -X PUT "$API/patients/PT-1001" -H "Content-Type: application/json" \
   -d '{"status": "Discharged", "ward": "General"}'
 
-# 4. Try to create a duplicate (expect 409)
+# 4. Validate duplicate rejection (POST /patients -> 409 Conflict)
 curl -X POST "$API/patients" -H "Content-Type: application/json" \
   -d '{"patientId": "PT-1001", "firstName": "Kwame", "lastName": "Mensah", "dateOfBirth": "1985-03-14", "bloodType": "O+", "primaryDiagnosis": "Malaria", "attendingPhysician": "Dr. Ama Boateng", "ward": "General", "admissionDate": "2026-09-20", "status": "Admitted", "weightKg": 72.5}'
 
-# 5. Send a record with a missing field (expect 400)
+# 5. Validate schema enforcement on missing fields (POST /patients -> 400 Bad Request)
 curl -X POST "$API/patients" -H "Content-Type: application/json" \
   -d '{"patientId": "PT-1009"}'
 
-# 6. Delete it, then confirm it is gone (expect 200, then 404)
+# 6. Validate discharge deletion & subsequent lookup (DELETE -> 200, GET -> 404)
 curl -X DELETE "$API/patients/PT-1001"
 curl "$API/patients/PT-1001"

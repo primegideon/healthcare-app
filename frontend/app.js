@@ -4,8 +4,7 @@
 // =====================================================================
 const API_BASE_URL = "https://3nuac0f5cl.execute-api.us-east-1.amazonaws.com/prod";
 
-// Track settings: this block is the ONLY part of app.js that differs
-// between the Healthcare, Finance and HR versions of the project.
+// Domain Entity Schema & Clinical Field Definitions
 const RESOURCE = "patients";        // API path: /patients
 const KEY_FIELD = "patientId";     // DynamoDB partition key
 const ENTITY = "Patient";
@@ -32,8 +31,10 @@ function endpoint(id) {
   return id ? `${base}/${encodeURIComponent(id)}` : base;
 }
 
-// One function for every API call. Throws an Error with the API's message
-// so every caller can show it to the user.
+/**
+ * Unified API client executing HTTP requests with bearer token authorization
+ * and centralized exception management.
+ */
 async function callApi(method, url, body) {
   const options = { method, headers: { "Content-Type": "application/json" } };
   
@@ -88,13 +89,13 @@ function formatValue(field, value, record) {
 function showMessage(text, type = "success") {
   const box = document.createElement("div");
   box.className = `message ${type}`;
-  box.textContent = text;          // textContent, never innerHTML: blocks script injection
+  box.textContent = text; // Output sanitized via textContent to prevent Cross-Site Scripting (XSS)
   const holder = document.getElementById("messages");
   holder.prepend(box);
   setTimeout(() => box.remove(), 6000);
 }
 
-// Disables a button while a request runs so it can't be clicked twice.
+// Disable submit button during asynchronous execution to prevent duplicate transactions
 async function withBusy(button, task) {
   button.disabled = true;
   try { await task(); }
@@ -265,7 +266,7 @@ document.getElementById("bookAppointmentForm").addEventListener("submit", (event
     
     await callApi("POST", `${endpoint(id)}/appointments`, { appointmentDate: date, reason: reason });
     
-    // Scroll to the top so the user can actually see the green success message!
+    // Scroll viewport to top to present confirmation banner
     window.scrollTo({ top: 0, behavior: 'smooth' });
     showMessage(`Appointment booked for ${date}.`);
     form.reset();
@@ -274,7 +275,7 @@ document.getElementById("bookAppointmentForm").addEventListener("submit", (event
     document.getElementById("bookAppointmentForm").style.display = "none";
     document.getElementById("showBookApptBtn").style.display = "inline-block";
     
-    // Smoothly refresh just the appointments list without reloading the whole patient panel
+    // Asynchronously refresh appointment schedule sub-view
     const apptsList = document.getElementById("appointmentsList");
     apptsList.innerHTML = "<li>Loading new appointment...</li>";
     try {

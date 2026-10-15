@@ -1,6 +1,5 @@
 """
 DeletePatient - removes a patient record
-Track: Healthcare (Patient Records System)
 API route: DELETE /patients/{patientId}
 """
 import json
@@ -12,8 +11,7 @@ import boto3
 from botocore.exceptions import ClientError
 
 # ---------------------------------------------------------------------------
-# Track configuration: this block is the ONLY part that differs between the
-# Healthcare, Finance and HR versions of the project.
+# Entity Configuration & Validation Rules
 # ---------------------------------------------------------------------------
 TABLE_NAME = os.environ.get("TABLE_NAME", "PatientRecords")
 KEY_NAME = "patientId"
